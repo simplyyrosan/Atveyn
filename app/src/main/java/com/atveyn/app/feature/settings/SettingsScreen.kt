@@ -32,10 +32,13 @@ import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.BatteryAlert
 import androidx.compose.material.icons.filled.Brightness4
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.CloudDownload
 import androidx.compose.material.icons.filled.CloudUpload
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.Percent
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material3.AlertDialog
@@ -77,6 +80,7 @@ import com.atveyn.app.core.designsystem.theme.Indigo500
 import com.atveyn.app.core.designsystem.theme.StatusAmber
 import com.atveyn.app.core.designsystem.theme.StatusGreen
 import com.atveyn.app.core.designsystem.theme.StatusRed
+import com.atveyn.app.core.update.AppUpdateManager
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -219,22 +223,86 @@ fun SettingsScreen(
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Default.Notifications, contentDescription = null, tint = Indigo500)
-                                Spacer(modifier = Modifier.width(10.dp))
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(42.dp)
+                                        .clip(RoundedCornerShape(12.dp))
+                                        .background(
+                                            if (settings.notificationsEnabled) Indigo500.copy(alpha = 0.16f)
+                                            else MaterialTheme.colorScheme.surfaceVariant
+                                        ),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = if (settings.notificationsEnabled) Icons.Filled.NotificationsActive else Icons.Filled.Notifications,
+                                        contentDescription = null,
+                                        tint = if (settings.notificationsEnabled) Indigo500 else MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.size(22.dp)
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(12.dp))
                                 Column {
-                                    Text("Class-End Reminders", fontWeight = FontWeight.SemiBold)
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Text("Class-End Reminders", fontWeight = FontWeight.SemiBold)
+                                        if (settings.notificationsEnabled) {
+                                            Spacer(modifier = Modifier.width(6.dp))
+                                            Box(
+                                                modifier = Modifier
+                                                    .clip(RoundedCornerShape(4.dp))
+                                                    .background(Indigo500.copy(alpha = 0.15f))
+                                                    .padding(horizontal = 6.dp, vertical = 2.dp)
+                                            ) {
+                                                Text(
+                                                    text = "Active",
+                                                    color = Indigo500,
+                                                    fontWeight = FontWeight.Bold,
+                                                    fontSize = 10.sp
+                                                )
+                                            }
+                                        }
+                                    }
                                     Text(
-                                        text = "Prompt to mark Present / Absent",
+                                        text = if (settings.notificationsEnabled) "Auto-prompt after every class" else "Prompt to mark Present / Absent",
                                         style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        color = if (settings.notificationsEnabled) Indigo500.copy(alpha = 0.85f) else MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 }
                             }
+                            Spacer(modifier = Modifier.width(8.dp))
                             Switch(
                                 checked = settings.notificationsEnabled,
                                 onCheckedChange = { viewModel.setNotificationsEnabled(it) },
-                                colors = SwitchDefaults.colors(checkedThumbColor = Indigo500)
+                                thumbContent = {
+                                    if (settings.notificationsEnabled) {
+                                        Icon(
+                                            imageVector = Icons.Filled.Check,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(SwitchDefaults.IconSize),
+                                            tint = Indigo500
+                                        )
+                                    } else {
+                                        Icon(
+                                            imageVector = Icons.Filled.Close,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(SwitchDefaults.IconSize),
+                                            tint = MaterialTheme.colorScheme.outline
+                                        )
+                                    }
+                                },
+                                colors = SwitchDefaults.colors(
+                                    checkedThumbColor = Color.White,
+                                    checkedTrackColor = Indigo500,
+                                    checkedBorderColor = Indigo500,
+                                    checkedIconColor = Indigo500,
+                                    uncheckedThumbColor = MaterialTheme.colorScheme.outline,
+                                    uncheckedTrackColor = MaterialTheme.colorScheme.surfaceVariant,
+                                    uncheckedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
+                                    uncheckedIconColor = MaterialTheme.colorScheme.outline
+                                )
                             )
                         }
 
@@ -443,7 +511,7 @@ fun SettingsScreen(
                     )
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
-                        text = "Version 1.5 • 100% Offline & Private",
+                        text = "Version ${AppUpdateManager.getAppVersionName(context)} • 100% Offline & Private",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

@@ -9,6 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,10 +19,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.OpenInBrowser
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.SystemUpdate
@@ -29,6 +33,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -74,6 +79,7 @@ fun AppUpdatesCard(
     val context = LocalContext.current
     var showRepoDialog by remember { mutableStateOf(false) }
     var repoInput by remember(githubRepo) { mutableStateOf(githubRepo) }
+    var showAllChangelogs by remember { mutableStateOf(false) }
 
     GlassCard(modifier = modifier.fillMaxWidth()) {
         Column(
@@ -418,6 +424,68 @@ fun AppUpdatesCard(
                     }
                 }
             }
+
+            Spacer(modifier = Modifier.height(14.dp))
+            Divider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
+            Spacer(modifier = Modifier.height(10.dp))
+
+            // Changelog & What's New Section
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Default.AutoAwesome,
+                        contentDescription = null,
+                        tint = Indigo500,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = "What's New in Updates",
+                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+
+                TextButton(
+                    onClick = { showAllChangelogs = !showAllChangelogs },
+                    contentPadding = PaddingValues(horizontal = 6.dp, vertical = 2.dp)
+                ) {
+                    Text(
+                        text = if (showAllChangelogs) "Show Less" else "All Versions",
+                        fontSize = 11.sp,
+                        color = Indigo500
+                    )
+                    Icon(
+                        imageVector = if (showAllChangelogs) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                        contentDescription = null,
+                        tint = Indigo500,
+                        modifier = Modifier.size(14.dp)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(6.dp))
+
+            // Latest changelog entry
+            ChangelogItemCard(defaultChangelogList.first())
+
+            // Older entries
+            AnimatedVisibility(visible = showAllChangelogs) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    for (entry in defaultChangelogList.drop(1)) {
+                        ChangelogItemCard(entry)
+                    }
+                }
+            }
         }
     }
 
@@ -461,5 +529,126 @@ fun AppUpdatesCard(
                 }
             }
         )
+    }
+}
+
+data class ChangelogEntry(
+    val version: String,
+    val releaseDate: String,
+    val isLatest: Boolean,
+    val items: List<String>
+)
+
+val defaultChangelogList = listOf(
+    ChangelogEntry(
+        version = "1.51",
+        releaseDate = "Current Release",
+        isLatest = true,
+        items = listOf(
+            "Overall Attendance Chart: Scaled percentage typography to fit cleanly inside the circular progress ring without overlapping.",
+            "Class-End Reminders Switch: Redesigned with Material 3 active badge, check/close indicators, and vibrant Indigo styling.",
+            "Updates Section Changelog: Added in-app interactive version history and release notes viewer in Settings.",
+            "GitHub Releases In-App Updater: Over-the-air update detection, progress download, and direct APK installation."
+        )
+    ),
+    ChangelogEntry(
+        version = "1.5",
+        releaseDate = "Previous Release",
+        isLatest = false,
+        items = listOf(
+            "Timetable Calendar: Integrated day dimming according to weekly schedule.",
+            "Stats Visualizer: Fixed text overlapping and bar clipping on analytics charts.",
+            "App Rebranding: Renamed to Atveyn with clean transparent branding.",
+            "Timetable OCR Scanner: ML Kit extraction with 12:00 NOON vs 12:00 PM and merged laboratory slot mapping."
+        )
+    ),
+    ChangelogEntry(
+        version = "1.4",
+        releaseDate = "Initial",
+        isLatest = false,
+        items = listOf(
+            "Smart Bunk Margin Calculator and What-If simulation engine.",
+            "Fast batch attendance logging (Present / Absent / Cancelled)."
+        )
+    )
+)
+
+@Composable
+private fun ChangelogItemCard(entry: ChangelogEntry) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(8.dp))
+            .background(
+                if (entry.isLatest) Indigo500.copy(alpha = 0.08f)
+                else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+            )
+            .border(
+                width = 1.dp,
+                color = if (entry.isLatest) Indigo500.copy(alpha = 0.3f) else Color.Transparent,
+                shape = RoundedCornerShape(8.dp)
+            )
+            .padding(10.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = "v${entry.version}",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 13.sp,
+                    color = if (entry.isLatest) Indigo500 else MaterialTheme.colorScheme.onSurface
+                )
+                if (entry.isLatest) {
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(Indigo500)
+                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                    ) {
+                        Text(
+                            text = "LATEST",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 9.sp
+                        )
+                    }
+                }
+            }
+            Text(
+                text = entry.releaseDate,
+                fontSize = 11.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+
+        Spacer(modifier = Modifier.height(6.dp))
+
+        entry.items.forEach { item ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 2.dp),
+                verticalAlignment = Alignment.Top
+            ) {
+                Text(
+                    text = "•",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 12.sp,
+                    color = if (entry.isLatest) Indigo500 else MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(end = 6.dp)
+                )
+                Text(
+                    text = item,
+                    style = MaterialTheme.typography.bodySmall,
+                    fontSize = 11.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
     }
 }

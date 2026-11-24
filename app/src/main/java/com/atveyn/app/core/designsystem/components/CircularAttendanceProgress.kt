@@ -5,6 +5,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -87,19 +88,40 @@ fun CircularAttendanceProgress(
             }
         }
 
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        val percentFontSize = when {
+            size <= 80.dp -> 13.sp
+            size <= 100.dp -> 16.sp
+            size <= 120.dp -> 19.sp
+            else -> 24.sp
+        }
+
+        val targetFontSize = when {
+            size <= 80.dp -> 8.sp
+            size <= 100.dp -> 9.sp
+            size <= 120.dp -> 10.sp
+            else -> 11.sp
+        }
+
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(horizontal = (strokeWidth + 2.dp))
+        ) {
             Text(
                 text = percentage?.let { String.format(Locale.US, "%.1f%%", it) } ?: "N/A",
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontWeight = FontWeight.Bold,
-                    fontSize = 26.sp
+                    fontSize = percentFontSize
                 ),
-                color = MaterialTheme.colorScheme.onBackground
+                color = MaterialTheme.colorScheme.onBackground,
+                maxLines = 1
             )
             Text(
                 text = "Target ${String.format(Locale.US, "%.0f%%", targetThreshold)}",
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                style = MaterialTheme.typography.labelSmall.copy(
+                    fontSize = targetFontSize
+                ),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1
             )
         }
     }
