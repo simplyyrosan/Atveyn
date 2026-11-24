@@ -23,6 +23,12 @@ class AppUpdateManagerTest {
         assertFalse(AppVersionComparator.isNewerVersion("1.5.0", "1.5"))
         assertFalse(AppVersionComparator.isNewerVersion("1.4", "1.5"))
         assertFalse(AppVersionComparator.isNewerVersion("1.4.9", "1.5"))
+        assertTrue(AppVersionComparator.isNewerVersion("1.52", "1.51"))
+        assertTrue(AppVersionComparator.isNewerVersion("v1.52", "1.51"))
+        assertTrue(AppVersionComparator.isNewerVersion("1.52", "1.5"))
+        assertFalse(AppVersionComparator.isNewerVersion("1.52", "1.52"))
+        assertFalse(AppVersionComparator.isNewerVersion("1.51", "1.52"))
+        assertFalse(AppVersionComparator.isNewerVersion("1.5", "1.52"))
         assertFalse(AppVersionComparator.isNewerVersion("", "1.5"))
     }
 }

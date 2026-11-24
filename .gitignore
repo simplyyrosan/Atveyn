@@ -51,6 +51,7 @@ captures/
 *.jks
 *.keystore
 !app/keystore/shared.keystore
+!app/keystore/release.jks
 !debug.keystore
 
 # External native build folder generated in Android Studio 2.2 and later

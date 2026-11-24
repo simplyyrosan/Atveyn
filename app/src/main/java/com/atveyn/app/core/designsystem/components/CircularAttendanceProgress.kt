@@ -67,7 +67,6 @@ fun CircularAttendanceProgress(
         Canvas(modifier = Modifier.size(size)) {
             val strokePx = strokeWidth.toPx()
             val radius = (size.toPx() - strokePx) / 2
-            val centerOffset = center
 
             // Track background
             drawCircle(

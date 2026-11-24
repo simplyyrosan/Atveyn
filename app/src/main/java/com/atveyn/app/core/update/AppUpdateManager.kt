@@ -25,7 +25,7 @@ data class UpdateInfo(
     val downloadUrl: String?,
     val htmlUrl: String,
     val publishedAt: String,
-    val currentVersion: String = "1.5"
+    val currentVersion: String = "1.52"
 )
 
 sealed interface UpdateState {
@@ -52,8 +52,8 @@ class AppUpdateManager @Inject constructor(
             val url = URL(apiUrl)
             val connection = (url.openConnection() as HttpURLConnection).apply {
                 requestMethod = "GET"
-                connectTimeout = 10000
-                readTimeout = 10000
+                connectTimeout = 15_000
+                readTimeout = 15_000
                 setRequestProperty("Accept", "application/vnd.github.v3+json")
                 setRequestProperty("User-Agent", "Atveyn-Android-App")
             }
@@ -67,6 +67,7 @@ class AppUpdateManager @Inject constructor(
             }
 
             val responseBody = connection.inputStream.bufferedReader().use { it.readText() }
+            connection.disconnect()
             val json = JSONObject(responseBody)
 
             val rawTag = json.optString("tag_name", "")
@@ -113,8 +114,10 @@ class AppUpdateManager @Inject constructor(
         onProgress: (Float, Long, Long) -> Unit
     ): Result<File> = withContext(Dispatchers.IO) {
         try {
+            // Sanitize version to prevent path manipulation
+            val safeVersion = version.replace(Regex("[^a-zA-Z0-9._-]"), "")
             val updatesDir = File(context.cacheDir, "updates").apply { mkdirs() }
-            val targetFile = File(updatesDir, "Atveyn-$version.apk")
+            val targetFile = File(updatesDir, "Atveyn-$safeVersion.apk")
 
             var currentUrl = downloadUrl
             var connection: HttpURLConnection
@@ -123,9 +126,14 @@ class AppUpdateManager @Inject constructor(
             // Follow HTTP redirects (GitHub releases redirect to AWS S3)
             while (true) {
                 val url = URL(currentUrl)
+                // Require HTTPS for security
+                if (!url.protocol.equals("https", ignoreCase = true)) {
+                    return@withContext Result.failure(SecurityException("Insecure download URL (HTTPS required)"))
+                }
+
                 connection = (url.openConnection() as HttpURLConnection).apply {
-                    connectTimeout = 15000
-                    readTimeout = 30000
+                    connectTimeout = 15_000
+                    readTimeout = 30_000
                     setRequestProperty("User-Agent", "Atveyn-Android-App")
                     instanceFollowRedirects = false
                 }
@@ -138,6 +146,7 @@ class AppUpdateManager @Inject constructor(
                 ) {
                     val location = connection.getHeaderField("Location")
                         ?: return@withContext Result.failure(Exception("Redirect without location header"))
+                    connection.disconnect()
                     currentUrl = location
                     redirectCount++
                     if (redirectCount > 5) {
@@ -149,6 +158,7 @@ class AppUpdateManager @Inject constructor(
             }
 
             if (connection.responseCode !in 200..299) {
+                connection.disconnect()
                 return@withContext Result.failure(Exception("Download failed with HTTP ${connection.responseCode}"))
             }
 
@@ -171,6 +181,7 @@ class AppUpdateManager @Inject constructor(
                     }
                 }
             }
+            connection.disconnect()
 
             Result.success(targetFile)
         } catch (e: Exception) {
@@ -180,6 +191,11 @@ class AppUpdateManager @Inject constructor(
 
     fun installApk(apkFile: File): Result<Unit> {
         return try {
+            if (!apkFile.exists() || apkFile.length() == 0L) {
+                return Result.failure(Exception("Update file is missing or corrupted. Please download again."))
+            }
+
+            // Check "Install unknown apps" permission on Android 8+ (API 26+)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 if (!context.packageManager.canRequestPackageInstalls()) {
                     val settingsIntent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES).apply {
@@ -187,7 +203,9 @@ class AppUpdateManager @Inject constructor(
                         flags = Intent.FLAG_ACTIVITY_NEW_TASK
                     }
                     context.startActivity(settingsIntent)
-                    return Result.failure(Exception("Please grant permission to install from unknown sources, then tap install again."))
+                    return Result.failure(
+                        Exception("Please allow Atveyn to install apps, then tap 'Install Update Now' again.")
+                    )
                 }
             }
 
@@ -203,6 +221,17 @@ class AppUpdateManager @Inject constructor(
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                 putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, true)
+            }
+
+            // Explicitly grant read URI permission to common installer packages
+            val installerPackages = listOf(
+                "com.google.android.packageinstaller",
+                "com.android.packageinstaller"
+            )
+            for (pkg in installerPackages) {
+                try {
+                    context.grantUriPermission(pkg, uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                } catch (_: Exception) {}
             }
 
             context.startActivity(installIntent)
@@ -225,9 +254,9 @@ class AppUpdateManager @Inject constructor(
                     @Suppress("DEPRECATION")
                     context.packageManager.getPackageInfo(context.packageName, 0)
                 }
-                pInfo.versionName ?: "1.5"
+                pInfo.versionName ?: "1.52"
             } catch (e: Exception) {
-                "1.5"
+                "1.52"
             }
         }
     }

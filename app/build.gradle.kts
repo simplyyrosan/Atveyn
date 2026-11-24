@@ -13,8 +13,8 @@ android {
         applicationId = "com.atveyn.app"
         minSdk = 26
         targetSdk = 34
-        versionCode = 3
-        versionName = "1.51"
+        versionCode = 8
+        versionName = "1.52"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -27,25 +27,29 @@ android {
     }
 
     signingConfigs {
-        create("shared") {
-            storeFile = file("keystore/shared.keystore")
-            storePassword = "android"
-            keyAlias = "androiddebugkey"
-            keyPassword = "android"
+        create("release") {
+            storeFile = file("keystore/release.jks")
+            storePassword = "atveyn2026release"
+            keyAlias = "atveyn_release_key"
+            keyPassword = "atveyn2026release"
+            enableV1Signing = true
+            enableV2Signing = true
+            enableV3Signing = true
         }
     }
 
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName("shared")
-            isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
         }
         debug {
-            signingConfig = signingConfigs.getByName("shared")
+            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = false
         }
     }
@@ -142,5 +146,3 @@ afterEvaluate {
         }
     }
 }
-
-

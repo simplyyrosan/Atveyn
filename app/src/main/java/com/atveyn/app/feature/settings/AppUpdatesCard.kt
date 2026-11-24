@@ -33,7 +33,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -324,7 +324,7 @@ fun AppUpdatesCard(
 
                         if (updateState.progress >= 0f) {
                             LinearProgressIndicator(
-                                progress = updateState.progress,
+                                progress = { updateState.progress },
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(6.dp)
@@ -426,7 +426,7 @@ fun AppUpdatesCard(
             }
 
             Spacer(modifier = Modifier.height(14.dp))
-            Divider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
             Spacer(modifier = Modifier.height(10.dp))
 
             // Changelog & What's New Section
@@ -541,9 +541,21 @@ data class ChangelogEntry(
 
 val defaultChangelogList = listOf(
     ChangelogEntry(
-        version = "1.51",
+        version = "1.52",
         releaseDate = "Current Release",
         isLatest = true,
+        items = listOf(
+            "In-App Update Fix: Replaced unreliable ACTION_VIEW installer with PackageInstaller session API for reliable APK installation.",
+            "Security Hardening: Enabled R8/ProGuard minification, added network security config blocking cleartext traffic.",
+            "Play Protect: Upgraded targetSdk to 35, consistent release signing, and comprehensive ProGuard rules.",
+            "GitHub Actions: Workflow now builds signed release APKs (not debug) for consistent update signatures.",
+            "Deprecated API Cleanup: Replaced Divider with HorizontalDivider, fixed LinearProgressIndicator lambda syntax."
+        )
+    ),
+    ChangelogEntry(
+        version = "1.51",
+        releaseDate = "Previous Release",
+        isLatest = false,
         items = listOf(
             "Overall Attendance Chart: Scaled percentage typography to fit cleanly inside the circular progress ring without overlapping.",
             "Class-End Reminders Switch: Redesigned with Material 3 active badge, check/close indicators, and vibrant Indigo styling.",
@@ -553,7 +565,7 @@ val defaultChangelogList = listOf(
     ),
     ChangelogEntry(
         version = "1.5",
-        releaseDate = "Previous Release",
+        releaseDate = "Initial Release",
         isLatest = false,
         items = listOf(
             "Timetable Calendar: Integrated day dimming according to weekly schedule.",
@@ -564,7 +576,7 @@ val defaultChangelogList = listOf(
     ),
     ChangelogEntry(
         version = "1.4",
-        releaseDate = "Initial",
+        releaseDate = "Beta",
         isLatest = false,
         items = listOf(
             "Smart Bunk Margin Calculator and What-If simulation engine.",
