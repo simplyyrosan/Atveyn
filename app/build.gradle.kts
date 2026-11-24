@@ -26,8 +26,18 @@ android {
         unitTests.isReturnDefaultValues = true
     }
 
+    signingConfigs {
+        create("shared") {
+            storeFile = file("keystore/shared.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
+
     buildTypes {
         release {
+            signingConfig = signingConfigs.getByName("shared")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -35,6 +45,7 @@ android {
             )
         }
         debug {
+            signingConfig = signingConfigs.getByName("shared")
             isMinifyEnabled = false
         }
     }
