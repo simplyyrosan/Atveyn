@@ -1,0 +1,85 @@
+name: Build & Release Atveyn APK
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version_name:
+        description: 'Version Name (e.g. 1.5.0)'
+        required: true
+        default: '1.5.0'
+      release_notes:
+        description: 'Release Notes'
+        required: false
+        default: 'New release of Atveyn'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build & Publish Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Grant Execute Permission for Gradlew
+        run: chmod +x gradlew
+
+      - name: Run Unit Tests
+        run: ./gradlew testDebugUnitTest --continue
+
+      - name: Build APK
+        run: ./gradlew assembleDebug
+
+      - name: Prepare APK Artifacts
+        run: |
+          mkdir -p release-artifacts
+          VERSION_TAG="${{ github.ref_name }}"
+          if [ -z "$VERSION_TAG" ] || [ "$VERSION_TAG" = "main" ]; then
+            VERSION_TAG="v${{ github.event.inputs.version_name }}"
+          fi
+          
+          # Copy and rename debug APK to friendly release name
+          cp app/build/outputs/apk/debug/app-debug.apk release-artifacts/Atveyn-${VERSION_TAG}.apk
+          cp app/build/outputs/apk/debug/app-debug.apk release-artifacts/Atveyn.apk
+          
+          echo "Built APK files:"
+          ls -la release-artifacts/
+
+      - name: Upload APK to GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+        with:
+          tag_name: ${{ github.ref_name || format('v{0}', github.event.inputs.version_name) }}
+          name: Atveyn ${{ github.ref_name || format('v{0}', github.event.inputs.version_name) }}
+          body: |
+            ### Atveyn Android Release
+            
+            ${{ github.event.inputs.release_notes || 'Automated release build of Atveyn.' }}
+            
+            #### Assets:
+            - **Atveyn.apk**: Complete offline-first Android Attendance & Timetable Manager application.
+            
+            #### Checksums:
+            SHA256: $(sha256sum release-artifacts/Atveyn.apk | awk '{print $1}')
+          files: |
+            release-artifacts/Atveyn-*.apk
+            release-artifacts/Atveyn.apk
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

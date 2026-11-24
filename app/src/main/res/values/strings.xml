@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Atveyn</string>
+    <string name="notification_channel_name">Class Attendance Reminders</string>
+    <string name="notification_channel_description">Notifications sent at the end of classes to log attendance</string>
+    <string name="action_present">Present</string>
+    <string name="action_absent">Absent</string>
+    <string name="action_remind_later">Remind Later</string>
+</resources>
