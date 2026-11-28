@@ -13,8 +13,8 @@ android {
         applicationId = "com.atveyn.app"
         minSdk = 26
         targetSdk = 34
-        versionCode = 8
-        versionName = "1.52"
+        versionCode = 10
+        versionName = "1.6"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

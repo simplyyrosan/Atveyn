@@ -25,7 +25,7 @@ data class UpdateInfo(
     val downloadUrl: String?,
     val htmlUrl: String,
     val publishedAt: String,
-    val currentVersion: String = "1.52"
+    val currentVersion: String = "1.6"
 )
 
 sealed interface UpdateState {
@@ -254,9 +254,9 @@ class AppUpdateManager @Inject constructor(
                     @Suppress("DEPRECATION")
                     context.packageManager.getPackageInfo(context.packageName, 0)
                 }
-                pInfo.versionName ?: "1.52"
+                pInfo.versionName ?: "1.6"
             } catch (e: Exception) {
-                "1.52"
+                "1.6"
             }
         }
     }
@@ -270,15 +270,33 @@ object AppVersionComparator {
         if (rClean.equals(cClean, ignoreCase = true)) return false
 
         try {
-            val remoteParts = rClean.split('.').mapNotNull { it.toIntOrNull() }
-            val currentParts = cClean.split('.').mapNotNull { it.toIntOrNull() }
+            val rTokens = rClean.split('.')
+            val cTokens = cClean.split('.')
 
-            val maxLen = maxOf(remoteParts.size, currentParts.size)
+            val maxLen = maxOf(rTokens.size, cTokens.size)
             for (i in 0 until maxLen) {
-                val r = remoteParts.getOrElse(i) { 0 }
-                val c = currentParts.getOrElse(i) { 0 }
-                if (r > c) return true
-                if (r < c) return false
+                val rStr = rTokens.getOrNull(i) ?: "0"
+                val cStr = cTokens.getOrNull(i) ?: "0"
+
+                val rInt = rStr.toIntOrNull()
+                val cInt = cStr.toIntOrNull()
+
+                if (rInt != null && cInt != null) {
+                    // Handle 2-digit patch compression without second dot (e.g. "6" vs "52")
+                    if (i == 1 && rStr.length != cStr.length && rStr.length <= 2 && cStr.length <= 2) {
+                        val rNormalized = rStr.padEnd(2, '0').toInt()
+                        val cNormalized = cStr.padEnd(2, '0').toInt()
+                        if (rNormalized > cNormalized) return true
+                        if (rNormalized < cNormalized) return false
+                    } else {
+                        if (rInt > cInt) return true
+                        if (rInt < cInt) return false
+                    }
+                } else {
+                    val comp = rStr.compareTo(cStr)
+                    if (comp > 0) return true
+                    if (comp < 0) return false
+                }
             }
         } catch (e: Exception) {
             return rClean != cClean

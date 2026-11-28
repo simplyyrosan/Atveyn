@@ -541,9 +541,22 @@ data class ChangelogEntry(
 
 val defaultChangelogList = listOf(
     ChangelogEntry(
-        version = "1.52",
+        version = "1.6",
         releaseDate = "Current Release",
         isLatest = true,
+        items = listOf(
+            "Fluent Dark Mode Redesign: Rebuilt dark mode with obsidian black (#08090D), elevated charcoal card surfaces (#10121A, #151722), and electric violet gradients (#7059FE -> #8B5CF6).",
+            "Luminous Status Indicators: Glowing indicator dots and translucent pills with hairline colored borders for live status, attendance health, and upcoming classes.",
+            "Squircle Metrics & Action Chips: Redesigned stats, quick action buttons, day switcher, and course avatars with modern squircle curvature.",
+            "Sleek Activity Trend Chart: Added dark slot-track capacity guides (#181A25) with smooth rounded capsule bars and horizontal target guidelines.",
+            "Floating Capsule Navigation: Floating bottom bar with elevated charcoal backdrop and glowing electric violet active tab capsule.",
+            "Stability & Compose Optimizations: Fixed LazyColumn item key collisions across dashboard sections and enhanced light/dark theme token reactivity."
+        )
+    ),
+    ChangelogEntry(
+        version = "1.52",
+        releaseDate = "Previous Release",
+        isLatest = false,
         items = listOf(
             "In-App Update Fix: Replaced unreliable ACTION_VIEW installer with PackageInstaller session API for reliable APK installation.",
             "Security Hardening: Enabled R8/ProGuard minification, added network security config blocking cleartext traffic.",
