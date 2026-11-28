@@ -1,8 +1,10 @@
 package com.atveyn.app.feature.dashboard
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,25 +19,21 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.EventNote
-import androidx.compose.material.icons.filled.Undo
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -49,6 +47,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
@@ -58,10 +57,21 @@ import androidx.compose.ui.unit.sp
 import com.atveyn.app.R
 import com.atveyn.app.core.designsystem.components.CircularAttendanceProgress
 import com.atveyn.app.core.designsystem.components.GlassCard
+import com.atveyn.app.core.designsystem.components.GlassCardHighlight
 import com.atveyn.app.core.designsystem.components.SessionStatusBadge
 import com.atveyn.app.core.designsystem.components.StatusBadge
+import com.atveyn.app.core.designsystem.theme.AtveynTheme
+import com.atveyn.app.core.designsystem.theme.BrandGradient
+import com.atveyn.app.core.designsystem.theme.BrandViolet
+import com.atveyn.app.core.designsystem.theme.BrandVioletLight
+import com.atveyn.app.core.designsystem.theme.BrandVioletSubtle
 import com.atveyn.app.core.designsystem.theme.Cyan500
+import com.atveyn.app.core.designsystem.theme.DarkSurfaceBorder
+import com.atveyn.app.core.designsystem.theme.DarkSurfaceHighlight
+import com.atveyn.app.core.designsystem.theme.GreenGradient
 import com.atveyn.app.core.designsystem.theme.Indigo500
+import com.atveyn.app.core.designsystem.theme.LightSurfaceBorder
+import com.atveyn.app.core.designsystem.theme.RedGradient
 import com.atveyn.app.core.designsystem.theme.StatusAmber
 import com.atveyn.app.core.designsystem.theme.StatusCancelled
 import com.atveyn.app.core.designsystem.theme.StatusGreen
@@ -98,16 +108,33 @@ fun DashboardScreen(
                             painter = painterResource(id = R.drawable.ic_atveyn_logo),
                             contentDescription = "Atveyn Logo",
                             modifier = Modifier
-                                .size(34.dp)
-                                .padding(end = 8.dp)
+                                .size(36.dp)
+                                .padding(end = 10.dp)
                         )
                         Column {
-                            Text(
-                                text = "Atveyn",
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 23.sp,
-                                color = MaterialTheme.colorScheme.onBackground
-                            )
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    text = "Atveyn",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 22.sp,
+                                    color = MaterialTheme.colorScheme.onBackground
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Box(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(6.dp))
+                                        .background(BrandVioletSubtle)
+                                        .border(1.dp, BrandViolet.copy(alpha = 0.3f), RoundedCornerShape(6.dp))
+                                        .padding(horizontal = 6.dp, vertical = 1.dp)
+                                ) {
+                                    Text(
+                                        text = "PRO",
+                                        color = BrandVioletLight,
+                                        fontSize = 9.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                            }
                             Text(
                                 text = DateTimeUtils.formatDisplayDate(DateTimeUtils.todayDate()),
                                 style = MaterialTheme.typography.labelSmall,
@@ -121,12 +148,14 @@ fun DashboardScreen(
                         OutlinedButton(
                             onClick = { viewModel.undoLastAction() },
                             shape = RoundedCornerShape(12.dp),
+                            border = BorderStroke(1.dp, BrandViolet.copy(alpha = 0.4f)),
+                            colors = ButtonDefaults.outlinedButtonColors(contentColor = BrandVioletLight),
                             contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
                             modifier = Modifier.padding(end = 8.dp)
                         ) {
-                            Icon(Icons.Default.Undo, contentDescription = "Undo", modifier = Modifier.size(16.dp))
+                            Icon(Icons.AutoMirrored.Filled.Undo, contentDescription = "Undo", modifier = Modifier.size(16.dp))
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text("Undo", fontSize = 12.sp)
+                            Text("Undo", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
                         }
                     }
                 },
@@ -139,7 +168,7 @@ fun DashboardScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),
-            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 90.dp),
+            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 6.dp, bottom = 96.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // Overall Attendance Glass Card
@@ -156,35 +185,64 @@ fun DashboardScreen(
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(
-                                text = "Overall Attendance",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.SemiBold
-                            )
+                            Column {
+                                Text(
+                                    text = "Overall Attendance",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onBackground
+                                )
+                                Text(
+                                    text = "Aggregated across all registered subjects",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
                             if (overall != null) {
                                 StatusBadge(status = overall.statusType)
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(18.dp))
 
                         CircularAttendanceProgress(
                             percentage = overall?.overallPercentage,
                             targetThreshold = overall?.overallTarget ?: 75.0,
-                            size = 140.dp,
+                            size = 148.dp,
                             strokeWidth = 13.dp
                         )
 
-                        Spacer(modifier = Modifier.height(18.dp))
+                        Spacer(modifier = Modifier.height(20.dp))
 
+                        // Fluent Metric Stat Chips (Squircle Card Style)
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceEvenly
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            DashboardStatChip("Conducted", overall?.totalConducted ?: 0, MaterialTheme.colorScheme.onSurface)
-                            DashboardStatChip("Present", overall?.totalPresent ?: 0, StatusGreen)
-                            DashboardStatChip("Absent", overall?.totalAbsent ?: 0, StatusRed)
-                            DashboardStatChip("Pending", overall?.totalPending ?: 0, StatusPending)
+                            FluentStatChip(
+                                label = "Total",
+                                count = overall?.totalConducted ?: 0,
+                                accentColor = MaterialTheme.colorScheme.onSurface,
+                                modifier = Modifier.weight(1f)
+                            )
+                            FluentStatChip(
+                                label = "Present",
+                                count = overall?.totalPresent ?: 0,
+                                accentColor = StatusGreen,
+                                modifier = Modifier.weight(1f)
+                            )
+                            FluentStatChip(
+                                label = "Absent",
+                                count = overall?.totalAbsent ?: 0,
+                                accentColor = StatusRed,
+                                modifier = Modifier.weight(1f)
+                            )
+                            FluentStatChip(
+                                label = "Pending",
+                                count = overall?.totalPending ?: 0,
+                                accentColor = StatusPending,
+                                modifier = Modifier.weight(1f)
+                            )
                         }
                     }
                 }
@@ -193,35 +251,67 @@ fun DashboardScreen(
             // Shortage Alerts Banner
             if (shortageSubjects.isNotEmpty()) {
                 item {
-                    GlassCard(
-                        modifier = Modifier.fillMaxWidth(),
-                        backgroundColor = StatusRed.copy(alpha = 0.12f)
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(20.dp))
+                            .background(StatusRed.copy(alpha = 0.12f))
+                            .border(BorderStroke(1.dp, StatusRed.copy(alpha = 0.35f)), RoundedCornerShape(20.dp))
+                            .padding(16.dp)
                     ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
+                        Column {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    imageVector = Icons.Default.Warning,
-                                    contentDescription = null,
-                                    tint = StatusRed,
-                                    modifier = Modifier.size(20.dp)
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    text = "Attendance Shortage Alert",
-                                    color = StatusRed,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 15.sp
-                                )
+                                Box(
+                                    modifier = Modifier
+                                        .size(30.dp)
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .background(StatusRed.copy(alpha = 0.2f)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Warning,
+                                        contentDescription = null,
+                                        tint = StatusRed,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Column {
+                                    Text(
+                                        text = "Attendance Shortage Alert",
+                                        color = StatusRed,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 14.sp
+                                    )
+                                    Text(
+                                        text = "${shortageSubjects.size} subject(s) currently below target threshold",
+                                        color = StatusRed.copy(alpha = 0.8f),
+                                        fontSize = 11.sp
+                                    )
+                                }
                             }
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(10.dp))
                             for (s in shortageSubjects) {
-                                Text(
-                                    text = "• ${s.subjectName}: ${s.attendancePercentage?.let { String.format(Locale.US, "%.1f%%", it) } ?: "0%"} (Need ${s.classesNeeded} more class${if (s.classesNeeded > 1) "es" else ""} for ${String.format(Locale.US, "%.0f%%", s.targetThreshold)})",
-                                    color = StatusRed,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    fontWeight = FontWeight.Medium,
-                                    modifier = Modifier.padding(vertical = 2.dp)
-                                )
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 3.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(5.dp)
+                                            .clip(CircleShape)
+                                            .background(StatusRed)
+                                    )
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text(
+                                        text = "${s.subjectName}: ${s.attendancePercentage?.let { String.format(Locale.US, "%.1f%%", it) } ?: "0%"} (Need ${s.classesNeeded} more class${if (s.classesNeeded > 1) "es" else ""} for ${String.format(Locale.US, "%.0f%%", s.targetThreshold)})",
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        fontWeight = FontWeight.Medium
+                                    )
+                                }
                             }
                         }
                     }
@@ -235,14 +325,14 @@ fun DashboardScreen(
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     QuickActionPill(
-                        label = "Scan",
+                        label = "Scan OCR",
                         icon = Icons.Default.CameraAlt,
-                        tint = Indigo500,
+                        tint = BrandViolet,
                         modifier = Modifier.weight(1f),
                         onClick = onNavigateToScanner
                     )
                     QuickActionPill(
-                        label = "Schedule",
+                        label = "Timetable",
                         icon = Icons.Default.CalendarMonth,
                         tint = Cyan500,
                         modifier = Modifier.weight(1f),
@@ -265,13 +355,31 @@ fun DashboardScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = "Today's Schedule",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(AtveynTheme.glass.cardBackgroundHighlight)
+                                .border(1.dp, if (AtveynTheme.glass.isDark) DarkSurfaceBorder else LightSurfaceBorder, RoundedCornerShape(8.dp))
+                                .padding(horizontal = 8.dp, vertical = 2.dp)
+                        ) {
+                            Text(
+                                text = "${uiState.todayClasses.size}",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = BrandVioletLight
+                            )
+                        }
+                    }
                     Text(
-                        text = "Today's Classes (${uiState.todayClasses.size})",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = "End-of-class alarms active",
+                        text = "End-of-class reminders on",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -291,7 +399,8 @@ fun DashboardScreen(
                             Text(
                                 text = "No classes scheduled for today!",
                                 style = MaterialTheme.typography.bodyLarge,
-                                fontWeight = FontWeight.Medium
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colorScheme.onBackground
                             )
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
@@ -303,7 +412,7 @@ fun DashboardScreen(
                     }
                 }
             } else {
-                items(uiState.todayClasses, key = { it.sessionId }) { item ->
+                items(uiState.todayClasses, key = { "class_${it.sessionId}" }) { item ->
                     TodayClassCard(
                         item = item,
                         onMarkStatus = { status -> viewModel.markSessionStatus(item.sessionId, status) }
@@ -313,23 +422,38 @@ fun DashboardScreen(
 
             // Subject-Wise Progress Section
             item {
-                Text(
-                    text = "Subject Progress",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Subject Performance",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                    Text(
+                        text = "${uiState.subjectSummaries.size} Subjects",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
 
             if (uiState.subjectSummaries.isEmpty()) {
                 item {
-                    Text(
-                        text = "No subjects added yet. Tap 'Scan' above to import your timetable.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    GlassCard(modifier = Modifier.fillMaxWidth()) {
+                        Text(
+                            text = "No subjects added yet. Tap 'Scan OCR' above to import your timetable.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(18.dp)
+                        )
+                    }
                 }
             } else {
-                items(uiState.subjectSummaries, key = { it.subjectId }) { sub ->
+                items(uiState.subjectSummaries, key = { "subj_${it.subjectId}" }) { sub ->
                     MiniSubjectProgressCard(
                         summary = sub,
                         onClick = { onNavigateToSubjectDetail(sub.subjectId) }
@@ -341,19 +465,36 @@ fun DashboardScreen(
 }
 
 @Composable
-fun DashboardStatChip(label: String, count: Int, color: Color) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(
-            text = "$count",
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            color = color
-        )
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
+fun FluentStatChip(
+    label: String,
+    count: Int,
+    accentColor: Color,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(16.dp))
+            .background(AtveynTheme.glass.cardBackgroundHighlight)
+            .border(BorderStroke(1.dp, if (AtveynTheme.glass.isDark) DarkSurfaceBorder else LightSurfaceBorder), RoundedCornerShape(16.dp))
+            .padding(vertical = 12.dp, horizontal = 6.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = "$count",
+                fontSize = 19.sp,
+                fontWeight = FontWeight.Bold,
+                color = accentColor,
+                letterSpacing = (-0.5).sp
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+                text = label,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
     }
 }
 
@@ -365,20 +506,35 @@ fun QuickActionPill(
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
-    GlassCard(
-        modifier = modifier,
-        onClick = onClick
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(18.dp))
+            .background(AtveynTheme.glass.cardBackgroundHighlight)
+            .border(BorderStroke(1.dp, if (AtveynTheme.glass.isDark) DarkSurfaceBorder else LightSurfaceBorder), RoundedCornerShape(18.dp))
+            .clickable(onClick = onClick)
+            .padding(vertical = 13.dp, horizontal = 10.dp),
+        contentAlignment = Alignment.Center
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 12.dp, horizontal = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
-            Icon(icon, contentDescription = null, tint = tint, modifier = Modifier.size(18.dp))
-            Spacer(modifier = Modifier.width(6.dp))
-            Text(label, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
+            Box(
+                modifier = Modifier
+                    .size(28.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(tint.copy(alpha = 0.16f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(icon, contentDescription = null, tint = tint, modifier = Modifier.size(16.dp))
+            }
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = label,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 12.5.sp,
+                color = MaterialTheme.colorScheme.onSurface
+            )
         }
     }
 }
@@ -391,7 +547,7 @@ fun TodayClassCard(
     val subjectColor = try {
         Color(android.graphics.Color.parseColor(item.colorHex))
     } catch (e: Exception) {
-        Indigo500
+        BrandViolet
     }
 
     val (badgeText, badgeColor, badgeBg) = when (item.status) {
@@ -400,7 +556,7 @@ fun TodayClassCard(
         SessionStatus.CANCELLED -> Triple("Cancelled", StatusCancelled, StatusCancelled.copy(alpha = 0.15f))
         SessionStatus.PENDING -> {
             if (item.isCurrent) {
-                Triple("In Progress", Indigo500, Indigo500.copy(alpha = 0.15f))
+                Triple("In Progress", BrandViolet, BrandVioletSubtle)
             } else if (item.isPast) {
                 Triple("Pending", StatusPending, StatusPending.copy(alpha = 0.15f))
             } else {
@@ -413,40 +569,81 @@ fun TodayClassCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(14.dp)
+                .padding(16.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.weight(1f)
+                ) {
                     Box(
                         modifier = Modifier
-                            .size(12.dp)
-                            .clip(CircleShape)
-                            .background(subjectColor)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = item.subjectName,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    if (item.isCurrent) {
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(6.dp))
-                                .background(Indigo500.copy(alpha = 0.2f))
-                                .padding(horizontal = 6.dp, vertical = 2.dp)
-                        ) {
+                            .size(36.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(subjectColor.copy(alpha = 0.18f))
+                            .border(1.dp, subjectColor.copy(alpha = 0.4f), RoundedCornerShape(10.dp)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = item.subjectCode.take(3).ifEmpty { item.subjectName.take(2) }.uppercase(),
+                            color = subjectColor,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 11.sp
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Column {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
-                                text = "LIVE NOW",
-                                color = Indigo500,
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold
+                                text = item.subjectName,
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onBackground
                             )
+                            if (item.isCurrent) {
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Box(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(5.dp))
+                                        .background(BrandVioletSubtle)
+                                        .border(1.dp, BrandViolet.copy(alpha = 0.35f), RoundedCornerShape(5.dp))
+                                        .padding(horizontal = 5.dp, vertical = 1.dp)
+                                ) {
+                                    Text(
+                                        text = "LIVE",
+                                        color = BrandVioletLight,
+                                        fontSize = 9.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                Icons.Default.AccessTime,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.size(12.dp)
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = DateTimeUtils.formatTimeRange12h(item.startTime, item.endTime),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            if (item.room.isNotBlank()) {
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(
+                                    text = "• ${item.room}",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
                         }
                     }
                 }
@@ -454,57 +651,35 @@ fun TodayClassCard(
                 SessionStatusBadge(text = badgeText, textColor = badgeColor, backgroundColor = badgeBg)
             }
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    Icons.Default.AccessTime,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(14.dp)
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = DateTimeUtils.formatTimeRange12h(item.startTime, item.endTime),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                if (item.room.isNotBlank()) {
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "• ${item.room}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            // Action Buttons (Present, Absent, Cancel)
+            // Action Buttons (Present, Absent, Cancel) - Fluent Capsule Pills
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                ActionMarkButton(
+                FluentActionButton(
                     label = "Present",
+                    icon = Icons.Default.Check,
                     isSelected = item.status == SessionStatus.PRESENT,
-                    activeColor = StatusGreen,
-                    modifier = Modifier.weight(1f),
+                    accentColor = StatusGreen,
+                    modifier = Modifier.weight(1.1f),
                     onClick = { onMarkStatus(SessionStatus.PRESENT) }
                 )
-                ActionMarkButton(
+                FluentActionButton(
                     label = "Absent",
+                    icon = Icons.Default.Close,
                     isSelected = item.status == SessionStatus.ABSENT,
-                    activeColor = StatusRed,
-                    modifier = Modifier.weight(1f),
+                    accentColor = StatusRed,
+                    modifier = Modifier.weight(1.1f),
                     onClick = { onMarkStatus(SessionStatus.ABSENT) }
                 )
-                ActionMarkButton(
+                FluentActionButton(
                     label = "Cancel",
+                    icon = null,
                     isSelected = item.status == SessionStatus.CANCELLED,
-                    activeColor = StatusCancelled,
-                    modifier = Modifier.weight(0.8f),
+                    accentColor = StatusCancelled,
+                    modifier = Modifier.weight(0.9f),
                     onClick = { onMarkStatus(SessionStatus.CANCELLED) }
                 )
             }
@@ -513,27 +688,44 @@ fun TodayClassCard(
 }
 
 @Composable
-fun ActionMarkButton(
+fun FluentActionButton(
     label: String,
+    icon: ImageVector?,
     isSelected: Boolean,
-    activeColor: Color,
+    accentColor: Color,
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
+    val bg = if (isSelected) accentColor else AtveynTheme.glass.cardBackgroundHighlight
+    val border = if (isSelected) accentColor else if (AtveynTheme.glass.isDark) DarkSurfaceBorder else LightSurfaceBorder
+    val textColor = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
+
     Box(
         modifier = modifier
-            .clip(RoundedCornerShape(10.dp))
-            .background(if (isSelected) activeColor else activeColor.copy(alpha = 0.12f))
+            .clip(RoundedCornerShape(12.dp))
+            .background(bg)
+            .border(BorderStroke(1.dp, border), RoundedCornerShape(12.dp))
             .clickable(onClick = onClick)
-            .padding(vertical = 8.dp),
+            .padding(vertical = 9.dp),
         contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = label,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = if (isSelected) Color.White else activeColor
-        )
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            if (icon != null) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = if (isSelected) Color.White else accentColor,
+                    modifier = Modifier.size(14.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+            }
+            Text(
+                text = label,
+                fontSize = 12.sp,
+                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                color = textColor
+            )
+        }
     }
 }
 
@@ -543,33 +735,48 @@ fun MiniSubjectProgressCard(
     onClick: () -> Unit
 ) {
     val progress = summary.attendancePercentage?.let { (it / 100.0).toFloat().coerceIn(0f, 1f) } ?: 0f
-    val color = when (summary.statusType) {
-        AttendanceStatusType.ON_TRACK -> StatusGreen
-        AttendanceStatusType.WARNING -> StatusAmber
-        AttendanceStatusType.SHORTAGE -> StatusRed
-        AttendanceStatusType.NO_DATA -> Color.Gray
+    val (_, color) = when (summary.statusType) {
+        AttendanceStatusType.ON_TRACK -> Pair(GreenGradient, StatusGreen)
+        AttendanceStatusType.WARNING -> Pair(BrandGradient, StatusAmber)
+        AttendanceStatusType.SHORTAGE -> Pair(RedGradient, StatusRed)
+        AttendanceStatusType.NO_DATA -> Pair(Brush.horizontalGradient(listOf(Color.Gray, Color.DarkGray)), Color.Gray)
     }
 
     GlassCard(
         modifier = Modifier.fillMaxWidth(),
         onClick = onClick
     ) {
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(14.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .padding(16.dp)
         ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = summary.subjectName,
                         style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.SemiBold
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onBackground
                     )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = "${summary.presentCount} / ${summary.conductedCount} attended • Target ${String.format(Locale.US, "%.0f%%", summary.targetThreshold)}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(color.copy(alpha = 0.14f))
+                        .border(1.dp, color.copy(alpha = 0.35f), RoundedCornerShape(8.dp))
+                        .padding(horizontal = 8.dp, vertical = 3.dp)
+                ) {
                     Text(
                         text = summary.attendancePercentage?.let { String.format(Locale.US, "%.1f%%", it) } ?: "N/A",
                         fontWeight = FontWeight.Bold,
@@ -577,17 +784,17 @@ fun MiniSubjectProgressCard(
                         fontSize = 13.sp
                     )
                 }
-                Spacer(modifier = Modifier.height(6.dp))
-                LinearProgressIndicator(
-                    progress = { progress },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(5.dp)
-                        .clip(RoundedCornerShape(2.5.dp)),
-                    color = color,
-                    trackColor = MaterialTheme.colorScheme.surfaceVariant
-                )
             }
+            Spacer(modifier = Modifier.height(12.dp))
+            LinearProgressIndicator(
+                progress = { progress },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(6.dp)
+                    .clip(RoundedCornerShape(3.dp)),
+                color = color,
+                trackColor = Color(0xFF1E202E)
+            )
         }
     }
 }

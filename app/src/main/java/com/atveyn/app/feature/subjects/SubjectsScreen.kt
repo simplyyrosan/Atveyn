@@ -1,7 +1,8 @@
 package com.atveyn.app.feature.subjects
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,14 +17,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Archive
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.HighlightOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -52,9 +50,19 @@ import androidx.compose.ui.unit.sp
 import com.atveyn.app.core.database.entity.SubjectEntity
 import com.atveyn.app.core.designsystem.components.GlassCard
 import com.atveyn.app.core.designsystem.components.StatusBadge
-import com.atveyn.app.core.designsystem.theme.Indigo500
+import com.atveyn.app.core.designsystem.theme.AtveynTheme
+import com.atveyn.app.core.designsystem.theme.BrandGradient
+import com.atveyn.app.core.designsystem.theme.BrandViolet
+import com.atveyn.app.core.designsystem.theme.BrandVioletLight
+import com.atveyn.app.core.designsystem.theme.BrandVioletSubtle
+import com.atveyn.app.core.designsystem.theme.DarkSurfaceBorder
+import com.atveyn.app.core.designsystem.theme.DarkSurfaceHighlight
+import com.atveyn.app.core.designsystem.theme.GreenGradient
+import com.atveyn.app.core.designsystem.theme.LightSurfaceBorder
+import com.atveyn.app.core.designsystem.theme.RedGradient
 import com.atveyn.app.core.designsystem.theme.StatusAmber
 import com.atveyn.app.core.designsystem.theme.StatusGreen
+import com.atveyn.app.core.designsystem.theme.StatusPending
 import com.atveyn.app.core.designsystem.theme.StatusRed
 import com.atveyn.app.core.model.AttendanceStatusType
 import com.atveyn.app.core.model.SubjectAttendanceSummary
@@ -74,16 +82,44 @@ fun SubjectsScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text("Subjects", fontWeight = FontWeight.Bold, fontSize = 22.sp)
-                },
-                actions = {
-                    IconButton(onClick = { viewModel.toggleShowArchived() }) {
-                        Icon(
-                            imageVector = Icons.Default.Archive,
-                            contentDescription = "Toggle Archived",
-                            tint = if (uiState.showArchived) Indigo500 else MaterialTheme.colorScheme.onSurfaceVariant
+                    Column {
+                        Text(
+                            text = "Subjects & Courses",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 22.sp,
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
+                        Text(
+                            text = "${uiState.summaries.size} active courses tracked",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
+                },
+                actions = {
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(if (uiState.showArchived) BrandVioletSubtle else AtveynTheme.glass.cardBackgroundHighlight)
+                            .border(
+                                1.dp,
+                                if (uiState.showArchived) BrandViolet.copy(alpha = 0.4f) else if (AtveynTheme.glass.isDark) DarkSurfaceBorder else LightSurfaceBorder,
+                                RoundedCornerShape(12.dp)
+                            )
+                    ) {
+                        IconButton(
+                            onClick = { viewModel.toggleShowArchived() },
+                            modifier = Modifier.size(38.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Archive,
+                                contentDescription = "Toggle Archived",
+                                tint = if (uiState.showArchived) BrandVioletLight else MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.size(19.dp)
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.width(12.dp))
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.Transparent
@@ -93,9 +129,9 @@ fun SubjectsScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { showAddDialog = true },
-                containerColor = Indigo500,
+                containerColor = BrandViolet,
                 contentColor = Color.White,
-                shape = RoundedCornerShape(16.dp)
+                shape = RoundedCornerShape(18.dp)
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Add Subject")
             }
@@ -114,7 +150,8 @@ fun SubjectsScreen(
                 Text(
                     text = "No Subjects Added Yet",
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
@@ -125,10 +162,10 @@ fun SubjectsScreen(
                 Spacer(modifier = Modifier.height(20.dp))
                 Button(
                     onClick = { showAddDialog = true },
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Indigo500)
+                    shape = RoundedCornerShape(14.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = BrandViolet)
                 ) {
-                    Text("Add First Subject")
+                    Text("Add First Subject", fontWeight = FontWeight.SemiBold)
                 }
             }
         } else {
@@ -136,8 +173,8 @@ fun SubjectsScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding),
-                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 90.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 96.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp)
             ) {
                 items(uiState.summaries, key = { it.subjectId }) { summary ->
                     SubjectCard(
@@ -196,18 +233,18 @@ fun SubjectCard(
     val subjectColor = try {
         Color(android.graphics.Color.parseColor(summary.colorHex))
     } catch (e: Exception) {
-        Indigo500
+        BrandViolet
     }
 
     val progress = summary.attendancePercentage?.let {
         (it / 100.0).toFloat().coerceIn(0f, 1f)
     } ?: 0f
 
-    val progressColor = when (summary.statusType) {
-        AttendanceStatusType.ON_TRACK -> StatusGreen
-        AttendanceStatusType.WARNING -> StatusAmber
-        AttendanceStatusType.SHORTAGE -> StatusRed
-        AttendanceStatusType.NO_DATA -> Color.Gray
+    val (_, progressColor) = when (summary.statusType) {
+        AttendanceStatusType.ON_TRACK -> Pair(GreenGradient, StatusGreen)
+        AttendanceStatusType.WARNING -> Pair(BrandGradient, StatusAmber)
+        AttendanceStatusType.SHORTAGE -> Pair(RedGradient, StatusRed)
+        AttendanceStatusType.NO_DATA -> Pair(BrandGradient, Color.Gray)
     }
 
     GlassCard(
@@ -217,26 +254,39 @@ fun SubjectCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(18.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.weight(1f)
+                ) {
                     Box(
                         modifier = Modifier
-                            .size(14.dp)
-                            .clip(CircleShape)
-                            .background(subjectColor)
-                    )
-                    Spacer(modifier = Modifier.width(10.dp))
+                            .size(42.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(subjectColor.copy(alpha = 0.16f))
+                            .border(1.dp, subjectColor.copy(alpha = 0.38f), RoundedCornerShape(12.dp)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = summary.subjectCode.take(3).ifEmpty { summary.subjectName.take(2) }.uppercase(),
+                            color = subjectColor,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 12.sp
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(12.dp))
                     Column {
                         Text(
                             text = summary.subjectName,
                             style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onBackground
                         )
                         if (summary.subjectCode.isNotBlank()) {
                             Text(
@@ -254,7 +304,7 @@ fun SubjectCard(
                         Spacer(modifier = Modifier.width(6.dp))
                         IconButton(
                             onClick = onEdit,
-                            modifier = Modifier.size(28.dp)
+                            modifier = Modifier.size(30.dp)
                         ) {
                             Icon(
                                 Icons.Default.Edit,
@@ -267,9 +317,9 @@ fun SubjectCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            // Percentage & Progress Bar
+            // Percentage & Target Row
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -279,61 +329,81 @@ fun SubjectCard(
                     text = summary.attendancePercentage?.let {
                         String.format(Locale.US, "%.1f%%", it)
                     } ?: "N/A",
-                    style = MaterialTheme.typography.headlineMedium,
+                    fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
-                    color = progressColor
+                    color = progressColor,
+                    letterSpacing = (-0.5).sp
                 )
                 Text(
                     text = "Target: ${String.format(Locale.US, "%.0f%%", summary.targetThreshold)}",
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontWeight = FontWeight.SemiBold
                 )
             }
 
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             LinearProgressIndicator(
                 progress = { progress },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(6.dp)
-                    .clip(RoundedCornerShape(3.dp)),
+                    .height(6.5.dp)
+                    .clip(RoundedCornerShape(3.5.dp)),
                 color = progressColor,
-                trackColor = MaterialTheme.colorScheme.surfaceVariant
+                trackColor = Color(0xFF1E202E)
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
             // Stats row (Present, Absent, Conducted, Pending)
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-                StatCounterChip(label = "Present", count = summary.presentCount, color = StatusGreen)
-                StatCounterChip(label = "Absent", count = summary.absentCount, color = StatusRed)
-                StatCounterChip(label = "Conducted", count = summary.conductedCount, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                StatCounterChip(label = "Present", count = summary.presentCount, color = StatusGreen, modifier = Modifier.weight(1f))
+                StatCounterChip(label = "Absent", count = summary.absentCount, color = StatusRed, modifier = Modifier.weight(1f))
+                StatCounterChip(label = "Total", count = summary.conductedCount, color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.weight(1f))
                 if (summary.pendingCount > 0) {
-                    StatCounterChip(label = "Pending", count = summary.pendingCount, color = Color(0xFF8B5CF6))
+                    StatCounterChip(label = "Pending", count = summary.pendingCount, color = StatusPending, modifier = Modifier.weight(1f))
                 }
             }
 
-            // Shortage / Safe margin alert text
+            // Shortage / Safe margin alert pill
             if (summary.statusType == AttendanceStatusType.SHORTAGE && summary.classesNeeded > 0) {
                 Spacer(modifier = Modifier.height(10.dp))
-                Text(
-                    text = "⚠️ Must attend next ${summary.classesNeeded} class${if (summary.classesNeeded > 1) "es" else ""} to reach ${String.format(Locale.US, "%.0f%%", summary.targetThreshold)}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = StatusRed,
-                    fontWeight = FontWeight.Medium
-                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(StatusRed.copy(alpha = 0.12f))
+                        .border(1.dp, StatusRed.copy(alpha = 0.3f), RoundedCornerShape(10.dp))
+                        .padding(horizontal = 10.dp, vertical = 6.dp)
+                ) {
+                    Text(
+                        text = "⚠️ Must attend next ${summary.classesNeeded} class${if (summary.classesNeeded > 1) "es" else ""} to reach ${String.format(Locale.US, "%.0f%%", summary.targetThreshold)}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = StatusRed,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
             } else if (summary.statusType == AttendanceStatusType.ON_TRACK && summary.marginClasses > 0) {
                 Spacer(modifier = Modifier.height(10.dp))
-                Text(
-                    text = "✓ Can safely miss up to ${summary.marginClasses} class${if (summary.marginClasses > 1) "es" else ""}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = StatusGreen,
-                    fontWeight = FontWeight.Medium
-                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(StatusGreen.copy(alpha = 0.12f))
+                        .border(1.dp, StatusGreen.copy(alpha = 0.3f), RoundedCornerShape(10.dp))
+                        .padding(horizontal = 10.dp, vertical = 6.dp)
+                ) {
+                    Text(
+                        text = "✓ Can safely miss up to ${summary.marginClasses} class${if (summary.marginClasses > 1) "es" else ""}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = StatusGreen,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
             }
         }
     }
@@ -343,19 +413,30 @@ fun SubjectCard(
 fun StatCounterChip(
     label: String,
     count: Int,
-    color: Color
+    color: Color,
+    modifier: Modifier = Modifier
 ) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Text(
-            text = "$label: ",
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Text(
-            text = "$count",
-            style = MaterialTheme.typography.labelSmall,
-            fontWeight = FontWeight.Bold,
-            color = color
-        )
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(10.dp))
+            .background(AtveynTheme.glass.cardBackgroundHighlight)
+            .border(1.dp, if (AtveynTheme.glass.isDark) DarkSurfaceBorder else LightSurfaceBorder, RoundedCornerShape(10.dp))
+            .padding(vertical = 6.dp, horizontal = 4.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = "$count",
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Bold,
+                color = color
+            )
+            Text(
+                text = label,
+                fontSize = 9.5.sp,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
     }
 }

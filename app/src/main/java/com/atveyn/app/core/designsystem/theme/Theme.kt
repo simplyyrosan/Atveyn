@@ -12,31 +12,32 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Indigo500,
+    primary = BrandViolet,
     onPrimary = Color.White,
-    primaryContainer = Indigo600.copy(alpha = 0.25f),
-    onPrimaryContainer = Indigo400,
+    primaryContainer = BrandVioletSubtle,
+    onPrimaryContainer = BrandVioletLight,
     secondary = Cyan500,
     onSecondary = Color.Black,
-    secondaryContainer = Cyan500.copy(alpha = 0.2f),
+    secondaryContainer = CyanSubtle,
     onSecondaryContainer = Cyan400,
-    background = Navy950,
-    onBackground = Color(0xFFF8FAFC),
-    surface = Navy900,
-    onSurface = Color(0xFFF8FAFC),
-    surfaceVariant = Navy850,
+    background = DarkBg,
+    onBackground = Color(0xFFFFFFFF),
+    surface = DarkSurface,
+    onSurface = Color(0xFFFFFFFF),
+    surfaceVariant = DarkSurfaceElevated,
     onSurfaceVariant = Color(0xFF94A3B8),
-    outline = Navy700
+    outline = DarkSurfaceBorder,
+    outlineVariant = Color(0xFF1C1E2B)
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Indigo600,
+    primary = BrandVioletDark,
     onPrimary = Color.White,
-    primaryContainer = Indigo500.copy(alpha = 0.12f),
-    onPrimaryContainer = Indigo600,
+    primaryContainer = BrandVioletSubtle,
+    onPrimaryContainer = BrandVioletDark,
     secondary = Cyan500,
     onSecondary = Color.White,
-    secondaryContainer = Cyan500.copy(alpha = 0.12f),
+    secondaryContainer = CyanSubtle,
     onSecondaryContainer = Cyan500,
     background = LightBg,
     onBackground = LightTextPrimary,
@@ -44,23 +45,30 @@ private val LightColorScheme = lightColorScheme(
     onSurface = LightTextPrimary,
     surfaceVariant = LightSurfaceElevated,
     onSurfaceVariant = LightTextSecondary,
-    outline = LightBorder
+    outline = LightBorder,
+    outlineVariant = Color(0xFFE2E8F0)
 )
 
 @Immutable
 data class ExtendedGlassColors(
     val cardBackground: Color,
     val cardBackgroundElevated: Color,
+    val cardBackgroundHighlight: Color,
     val cardBorder: Brush,
+    val cardBorderSubtle: Brush,
+    val brandGradient: Brush,
     val subtleOverlay: Color,
     val isDark: Boolean
 )
 
 val LocalGlassColors = staticCompositionLocalOf {
     ExtendedGlassColors(
-        cardBackground = Navy850.copy(alpha = 0.82f),
-        cardBackgroundElevated = Navy800.copy(alpha = 0.88f),
-        cardBorder = Brush.verticalGradient(listOf(GlassBorderDark, Color(0x05818CF8))),
+        cardBackground = DarkSurface,
+        cardBackgroundElevated = DarkSurfaceElevated,
+        cardBackgroundHighlight = DarkSurfaceHighlight,
+        cardBorder = CardBorderGradient,
+        cardBorderSubtle = Brush.verticalGradient(listOf(DarkSurfaceBorder, Color.Transparent)),
+        brandGradient = BrandGradient,
         subtleOverlay = GlassOverlayDark,
         isDark = true
     )
@@ -91,27 +99,38 @@ fun AtveynTheme(
 
     val glassColors = if (darkTheme) {
         ExtendedGlassColors(
-            cardBackground = Navy850.copy(alpha = 0.82f),
-            cardBackgroundElevated = Navy800.copy(alpha = 0.88f),
-            cardBorder = Brush.verticalGradient(
+            cardBackground = DarkSurface,
+            cardBackgroundElevated = DarkSurfaceElevated,
+            cardBackgroundHighlight = DarkSurfaceHighlight,
+            cardBorder = CardBorderGradient,
+            cardBorderSubtle = Brush.verticalGradient(
                 listOf(
-                    Color(0x40818CF8),
-                    Color(0x10818CF8)
+                    Color(0xFF262838),
+                    Color(0x10262838)
                 )
             ),
+            brandGradient = BrandGradient,
             subtleOverlay = GlassOverlayDark,
             isDark = true
         )
     } else {
         ExtendedGlassColors(
-            cardBackground = Color(0xF5FFFFFF),
+            cardBackground = Color(0xFFFFFFFF),
             cardBackgroundElevated = Color(0xFFF8FAFC),
+            cardBackgroundHighlight = Color(0xFFF1F5F9),
             cardBorder = Brush.verticalGradient(
                 listOf(
-                    Color(0x60CBD5E1),
+                    Color(0x70CBD5E1),
                     Color(0x20E2E8F0)
                 )
             ),
+            cardBorderSubtle = Brush.verticalGradient(
+                listOf(
+                    Color(0x40E2E8F0),
+                    Color(0x10E2E8F0)
+                )
+            ),
+            brandGradient = BrandGradient,
             subtleOverlay = GlassOverlayLight,
             isDark = false
         )

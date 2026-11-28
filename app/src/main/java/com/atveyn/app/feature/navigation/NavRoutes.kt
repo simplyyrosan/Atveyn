@@ -1,10 +1,10 @@
 package com.atveyn.app.feature.navigation
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Insights
-import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
 
@@ -30,6 +30,6 @@ enum class BottomNavItem(
     HOME(NavRoutes.HOME, "Home", Icons.Default.Home),
     TIMETABLE(NavRoutes.TIMETABLE, "Timetable", Icons.Default.CalendarMonth),
     STATS(NavRoutes.STATS, "Stats", Icons.Default.Insights),
-    SUBJECTS(NavRoutes.SUBJECTS, "Subjects", Icons.Default.MenuBook),
+    SUBJECTS(NavRoutes.SUBJECTS, "Subjects", Icons.AutoMirrored.Filled.MenuBook),
     SETTINGS(NavRoutes.SETTINGS, "Settings", Icons.Default.Settings)
 }

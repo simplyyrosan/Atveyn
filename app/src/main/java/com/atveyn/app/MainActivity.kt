@@ -41,7 +41,7 @@ class MainActivity : ComponentActivity() {
 
     private val requestNotificationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
+    ) { _ ->
         // Permission result handled
     }
 
@@ -70,7 +70,6 @@ class MainActivity : ComponentActivity() {
                 else -> ThemeMode.SYSTEM
             }
 
-            val hasCompletedOnboarding = settings?.hasCompletedOnboarding ?: true
             val startDestination = if (settings != null && !settings!!.hasCompletedOnboarding) {
                 NavRoutes.ONBOARDING
             } else {

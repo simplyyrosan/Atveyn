@@ -22,10 +22,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Archive
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ChevronLeft
@@ -187,7 +187,7 @@ fun SubjectDetailScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
                 actions = {
@@ -270,28 +270,25 @@ fun SubjectDetailScreen(
                         ) {
                             Box(
                                 modifier = Modifier
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .background(
-                                        Brush.horizontalGradient(
-                                            listOf(Color(0xFF15803D), Color(0xFF16A34A))
-                                        )
-                                    )
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(com.atveyn.app.core.designsystem.theme.BrandVioletSubtle)
+                                    .border(1.dp, com.atveyn.app.core.designsystem.theme.BrandViolet.copy(alpha = 0.35f), RoundedCornerShape(10.dp))
                                     .clickable { currentYearMonth = currentYearMonth.minusMonths(1) }
-                                    .padding(horizontal = 14.dp, vertical = 8.dp)
+                                    .padding(horizontal = 14.dp, vertical = 7.dp)
                             ) {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Icon(
                                         Icons.Default.ChevronLeft,
                                         contentDescription = "Previous Month",
-                                        tint = Color.White,
+                                        tint = com.atveyn.app.core.designsystem.theme.BrandVioletLight,
                                         modifier = Modifier.size(16.dp)
                                     )
                                     Spacer(modifier = Modifier.width(2.dp))
                                     Text(
                                         text = "PREV",
-                                        color = Color.White,
+                                        color = com.atveyn.app.core.designsystem.theme.BrandVioletLight,
                                         fontWeight = FontWeight.Bold,
-                                        fontSize = 12.sp
+                                        fontSize = 11.5.sp
                                     )
                                 }
                             }
@@ -299,33 +296,31 @@ fun SubjectDetailScreen(
                             Text(
                                 text = currentYearMonth.format(DateTimeFormatter.ofPattern("MMM yyyy", Locale.US)).uppercase(),
                                 style = MaterialTheme.typography.titleLarge,
-                                fontWeight = FontWeight.ExtraBold,
-                                letterSpacing = 1.sp
+                                fontWeight = FontWeight.Bold,
+                                letterSpacing = 1.sp,
+                                color = MaterialTheme.colorScheme.onBackground
                             )
 
                             Box(
                                 modifier = Modifier
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .background(
-                                        Brush.horizontalGradient(
-                                            listOf(Color(0xFF16A34A), Color(0xFF15803D))
-                                        )
-                                    )
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(com.atveyn.app.core.designsystem.theme.BrandVioletSubtle)
+                                    .border(1.dp, com.atveyn.app.core.designsystem.theme.BrandViolet.copy(alpha = 0.35f), RoundedCornerShape(10.dp))
                                     .clickable { currentYearMonth = currentYearMonth.plusMonths(1) }
-                                    .padding(horizontal = 14.dp, vertical = 8.dp)
+                                    .padding(horizontal = 14.dp, vertical = 7.dp)
                             ) {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Text(
                                         text = "NEXT",
-                                        color = Color.White,
+                                        color = com.atveyn.app.core.designsystem.theme.BrandVioletLight,
                                         fontWeight = FontWeight.Bold,
-                                        fontSize = 12.sp
+                                        fontSize = 11.5.sp
                                     )
                                     Spacer(modifier = Modifier.width(2.dp))
                                     Icon(
                                         Icons.Default.ChevronRight,
                                         contentDescription = "Next Month",
-                                        tint = Color.White,
+                                        tint = com.atveyn.app.core.designsystem.theme.BrandVioletLight,
                                         modifier = Modifier.size(16.dp)
                                     )
                                 }
@@ -565,11 +560,15 @@ fun SubjectDetailScreen(
 
                             Box(
                                 modifier = Modifier
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .background(
-                                        Brush.horizontalGradient(
-                                            listOf(Color(0xFF334155), Color(0xFF1E293B))
-                                        )
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(com.atveyn.app.core.designsystem.theme.AtveynTheme.glass.cardBackgroundHighlight)
+                                    .border(
+                                        1.dp,
+                                        if (com.atveyn.app.core.designsystem.theme.AtveynTheme.glass.isDark)
+                                            com.atveyn.app.core.designsystem.theme.DarkSurfaceBorder
+                                        else
+                                            com.atveyn.app.core.designsystem.theme.LightSurfaceBorder,
+                                        RoundedCornerShape(10.dp)
                                     )
                                     .clickable { showMoreInfo = !showMoreInfo }
                                     .padding(horizontal = 12.dp, vertical = 6.dp)
@@ -578,13 +577,13 @@ fun SubjectDetailScreen(
                                     Icon(
                                         imageVector = if (showMoreInfo) Icons.Default.KeyboardArrowUp else Icons.Default.Info,
                                         contentDescription = null,
-                                        tint = Color.White,
+                                        tint = MaterialTheme.colorScheme.onSurface,
                                         modifier = Modifier.size(14.dp)
                                     )
                                     Spacer(modifier = Modifier.width(4.dp))
                                     Text(
                                         text = if (showMoreInfo) "Hide Info" else "More Info",
-                                        color = Color.White,
+                                        color = MaterialTheme.colorScheme.onSurface,
                                         fontWeight = FontWeight.SemiBold,
                                         fontSize = 12.sp
                                     )
@@ -809,7 +808,6 @@ fun SubjectDetailScreen(
 
     if (showAddPastClassDialog) {
         AddPastClassDialog(
-            subjectId = currentSubject.id,
             initialDate = prefillDateForAddDialog,
             onDismiss = { showAddPastClassDialog = false },
             onConfirm = { date, start, end, status ->
@@ -902,14 +900,14 @@ fun CalendarDayCell(
     onClick: () -> Unit
 ) {
     val backgroundColor = when (status) {
-        SessionStatus.PRESENT -> Color(0xFF16A34A) // Vibrant Green
-        SessionStatus.ABSENT -> Color(0xFFDC2626)  // Vibrant Red
-        SessionStatus.CANCELLED -> Color(0xFFF97316) // Orange
+        SessionStatus.PRESENT -> StatusGreen
+        SessionStatus.ABSENT -> StatusRed
+        SessionStatus.CANCELLED -> StatusCancelled
         SessionStatus.PENDING -> StatusPending.copy(alpha = 0.5f)
         null -> if (isScheduledDay) {
-            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f) // Dimmed / greyed out for timetable days
+            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
         } else {
-            MaterialTheme.colorScheme.surface.copy(alpha = 0.5f)
+            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f)
         }
     }
 
@@ -919,7 +917,7 @@ fun CalendarDayCell(
     }
 
     val borderColor = when {
-        isToday -> Color(0xFF2563EB) // Bright blue border for today
+        isToday -> com.atveyn.app.core.designsystem.theme.BrandVioletLight
         status == null && isScheduledDay -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.25f)
         status == null -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f)
         else -> Color.Transparent
@@ -930,9 +928,9 @@ fun CalendarDayCell(
     Box(
         modifier = modifier
             .aspectRatio(1f)
-            .clip(RoundedCornerShape(6.dp))
+            .clip(RoundedCornerShape(8.dp))
             .background(backgroundColor)
-            .border(width = borderWidth, color = borderColor, shape = RoundedCornerShape(6.dp))
+            .border(width = borderWidth, color = borderColor, shape = RoundedCornerShape(8.dp))
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
@@ -1268,7 +1266,6 @@ fun StatBox(label: String, count: Int, color: Color) {
 
 @Composable
 fun AddPastClassDialog(
-    subjectId: Long,
     initialDate: String = DateTimeUtils.todayDate(),
     onDismiss: () -> Unit,
     onConfirm: (String, String, String, SessionStatus) -> Unit
